@@ -1,0 +1,2 @@
+The inner frame scematic is made for Material thats 6mm wide. and will only work with 6mm unless modifications are made for the "fingers".
+The Outer frame is as follows.all Sides are 3mm, bottom 3mm And the Top piece is recommended to use 5 or 6mm but the scematic is made so that any thickness works.
