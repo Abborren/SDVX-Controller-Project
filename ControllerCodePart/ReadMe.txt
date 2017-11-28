@@ -9,8 +9,8 @@ BT-D = o
 FX-L = C
 FX-R = M
 
-FX-L + FX-R + BT-D + Start button = SDVX Compabillity
-FX-L + FX-R + BT-C + Start button = Light Reverse mode
+FX-L + FX-R + BT-C + Start button = SDVX Compabillity
+FX-L + FX-R + BT-B + Start button = Light Reverse mode
 Any BT button + Start Button = ESC
 ------------------------
 
@@ -24,3 +24,4 @@ Right encoder Right = 9
 Take note that the encoders from the schematic might not be in the right direction play around untill you get it right.
 Note, I'm not responsible for any broken components, this code probably won't break anything but don guarantees also, google what resistor you need for the LED
 the ones in the schematic might not be correct.
+The buttons are the same for the LeovxHQ version the difference is that it has the pins that is compatible with leovxHQ code

@@ -1,16 +1,42 @@
 /* This code is a heavily modified version of leonardojoy's code and works for a arduino leonardo or
 pro micro which is based upon leonardo
-and works with K-shootmania but also Sound voltex III pc port version.*/
+and works with K-shootmania but also Sound voltex III pc port version.
+Made By Abborren, 2017 
+https://github.com/Abborren/SDVX-Controller-Project */
+
+
+#define StartBtn A2 // StartButton
+const byte FxL = 10; // FX-L
+const byte FxR = 9; // FX-R
+//BT buttons
+const byte BtA = 15; //BT-A
+const byte BtB = 14; //BT-B
+const byte BtC = 7; //BT-C
+const byte BtD = 6; //BT-D
+
+const byte StartBtnL =  21; // Start button light
+const byte FxLL = 16; // FX-L light
+const byte FxRL = 8; // FX-R light
+
+#define BtAL A1 // BT-A light
+#define BtBL A0 // BT-B light
+const byte BtCL = 5; //BT-C light
+const byte BtDL = 4; //BT-D light
+
+const byte EncoderLL = 0; // encoder left
+const byte EncoderLR = 1; // encoder left
+const byte EncoderRL = 2; // encoder right
+const byte EncoderRR = 3; // encoder right
 
 
 #include <Mouse.h>
 #include <Keyboard.h>
 #define DELAY            5  // Delay per loop in ms
 enum PinAssignments {
-  encoderPinA = 0,
-  encoderPinB = 1,
-  encoderPinC = 2,
-  encoderPinD = 3,
+  encoderPinA = EncoderLL, // encoder left plus movement
+  encoderPinB = EncoderLR, // encoder left minus movement
+  encoderPinC = EncoderRL, // encoder right plus movement
+  encoderPinD = EncoderRR, // encoder right minus movement (probably)
 
 };
 //This is up to your pin wiring
@@ -29,39 +55,41 @@ boolean On = false;
 boolean offL = false;
 boolean offR = false;
   // this is where you change the different timer values for the blinking, left and right is the same. in ms.
-int speedI[] = {122, 102, 82, 62,42, 22};
+int speedI[] = {122, 102, 82, 62 ,42 , 22};
 
-int pinOut[] = {4,5, A0,A1}; // this is the lightning pins for BT-A to BT-D used in the animation.
+int pinOut[] = {BtDL,BtCL, BtBL, BtAL}; // this is the lightning pins for BT-A to BT-D used in the animation.
 int ledPinLeft = -1;
 int ledPinRight = 5;
 
 unsigned long previousMillis1 = 0;
 unsigned long previousMillis2 = 0;
-//initial speed value, if you disable the encoderSpeed() funtion chagne these values to the animation speed you want. in ms.
+//initial speed value, these values to the animation speed you want. in ms. if you disable the encoderSpeed() this will remove the animation.
  long interval1 = 75;
  long interval2 = 75;
 
 void setup() {
     // StartBTN
-  pinMode(A2, INPUT_PULLUP); //Start BTN
+  pinMode(StartBtn, INPUT_PULLUP); //Start BTN
     // FX buttons
-  pinMode(9, INPUT_PULLUP); // FX-R
-  pinMode(10, INPUT_PULLUP); // FX-L
+  pinMode(FxR, INPUT_PULLUP); // FX-R
+  pinMode(FxL, INPUT_PULLUP); // FX-L
     //BT buttons
-  pinMode(7, INPUT_PULLUP); //BT-C
-  pinMode(6, INPUT_PULLUP); // BT-D
-  pinMode(14, INPUT_PULLUP); // BT-B
-  pinMode(15, INPUT_PULLUP); // BT-A
+  pinMode(BtC, INPUT_PULLUP); //BT-C
+  pinMode(BtD, INPUT_PULLUP); // BT-D
+  pinMode(BtB, INPUT_PULLUP); // BT-B
+  pinMode(BtA, INPUT_PULLUP); // BT-A
     //Start BTN Light
-  pinMode(A3, OUTPUT); //START BTN Light
+  pinMode(StartBtnL, OUTPUT); //START BTN Light
     //FX LIGHTS
-  pinMode(8, OUTPUT); // FX-L LIGHT
-  pinMode(16, OUTPUT); // FX-R LIGHT
+  pinMode(FxLL, OUTPUT); // FX-L LIGHT
+  pinMode(FxRL, OUTPUT); // FX-R RIGHT
     //BT Lights
-  pinMode(4, OUTPUT); //BT-D Light
-  pinMode(5, OUTPUT); //BT-C Light
-  pinMode(A0, OUTPUT); // BT-B LIGHT
-  pinMode(A1, OUTPUT); // BT-A LIGHT
+  pinMode(BtAL, OUTPUT); // BT-A LIGHT
+  pinMode(BtBL, OUTPUT); // BT-B LIGHT
+  pinMode(BtCL, OUTPUT); //BT-C Light
+  pinMode(BtDL, OUTPUT); //BT-D Light
+
+
 
   Keyboard.begin();
     // VOL-L
@@ -73,100 +101,99 @@ void setup() {
     //VOL-R
   pinMode(encoderPinC, INPUT_PULLUP);
   pinMode(encoderPinD, INPUT_PULLUP);
-  //Not the same pin as encoderPinA etc!
-  attachInterrupt(2, doEncoderA, CHANGE);
-  attachInterrupt(3, doEncoderB, CHANGE);
+  // do not change the attach intterupts
+  attachInterrupt(EncoderRL, doEncoderA, CHANGE);
+  attachInterrupt(EncoderRR, doEncoderB, CHANGE);
 
-  attachInterrupt(0, doEncoderC, CHANGE);
-  attachInterrupt(1, doEncoderD, CHANGE);
-
-  Serial.begin(9600);
+  attachInterrupt(EncoderLL, doEncoderC, CHANGE);
+  attachInterrupt(EncoderLR, doEncoderD, CHANGE);
 }
 
 void loop() {
-  if (digitalRead(7) == LOW) {
-    Keyboard.press('i');
-    if(LightsReverseOn == true) digitalWrite(5, LOW);
-      else digitalWrite(5, HIGH);
-  }else if (digitalRead(7) == HIGH) {
-    Keyboard.release('i');
-    if(LightsReverseOn == true) digitalWrite(5, HIGH);
-      else if(offL == false && offR == false) digitalWrite(5, LOW);
-  }
-  if (digitalRead(6) == LOW) {
-    Keyboard.press('o');
-    if(LightsReverseOn == true) digitalWrite(4, LOW);
-      else digitalWrite(4, HIGH);
-  } else if (digitalRead(6) == HIGH) {
-    Keyboard.release('o');
-    if(LightsReverseOn == true) digitalWrite(4, HIGH);
-      else if(offL == false && offR == false) digitalWrite(4, LOW);
-  }
-  if (digitalRead(14) == LOW) {
-    Keyboard.press('e');
-    if(LightsReverseOn == true) digitalWrite(A0, LOW);
-      else digitalWrite(A0, HIGH);
-  } else if (digitalRead(14) == HIGH) {
-      Keyboard.release('e');
-      if(LightsReverseOn == true) digitalWrite(A0, HIGH);
-       else if(offL == false && offR == false) digitalWrite(A0, LOW);
-  }
-  if (digitalRead(15) == LOW) {
-    Keyboard.press('w');
-     if(LightsReverseOn == true) digitalWrite(A1, LOW);
-     else digitalWrite(A1, HIGH);
-  } else if (digitalRead(15) == HIGH) {
+  if (digitalRead(BtA) == LOW) {
+   Keyboard.press('w');
+     if(LightsReverseOn == true) digitalWrite(BtAL, LOW);
+     else digitalWrite(BtAL, HIGH);
+  } else if (digitalRead(BtA) == HIGH) {
       Keyboard.release('w');
-      if(LightsReverseOn == true) digitalWrite(A1, HIGH);
-       else if(offL == false && offR == false) digitalWrite(A1, LOW);
+      if(LightsReverseOn == true) digitalWrite(BtAL, HIGH);
+       else if(offL == false && offR == false) digitalWrite(BtAL, LOW);
   }
-  if (digitalRead(9) == LOW) {
+  if (digitalRead(BtB) == LOW) {
+    Keyboard.press('e');
+    if(LightsReverseOn == true) digitalWrite(BtBL, LOW);
+      else digitalWrite(BtBL, HIGH);
+  } else if (digitalRead(BtB) == HIGH) {
+      Keyboard.release('e');
+      if(LightsReverseOn == true) digitalWrite(BtBL, HIGH);
+       else if(offL == false && offR == false) digitalWrite(BtBL, LOW);
+  }
+  if (digitalRead(BtC) == LOW) {
+    Keyboard.press('i');
+    if(LightsReverseOn == true) digitalWrite(BtCL, LOW);
+      else digitalWrite(BtCL, HIGH);
+  }else if (digitalRead(BtC) == HIGH) {
+    Keyboard.release('i');
+    if(LightsReverseOn == true) digitalWrite(BtCL, HIGH);
+      else if(offL == false && offR == false) digitalWrite(BtCL, LOW);
+  }
+  if (digitalRead(BtD) == LOW) {
+    Keyboard.press('o');
+    if(LightsReverseOn == true) digitalWrite(BtDL, LOW);
+      else digitalWrite(BtDL, HIGH);
+  } else if (digitalRead(BtD) == HIGH) {
+    Keyboard.release('o');
+    if(LightsReverseOn == true) digitalWrite(BtDL, HIGH);
+      else if(offL == false && offR == false) digitalWrite(BtDL, LOW);
+  }
+
+  if (digitalRead(FxR) == LOW) {
       Keyboard.press('m');
-      if(LightsReverseOn == true) digitalWrite(8, LOW);
-       else digitalWrite(8, HIGH);
-  } else if (digitalRead(9) == HIGH) {
+      if(LightsReverseOn == true) digitalWrite(FxRL, LOW);
+       else digitalWrite(FxRL, HIGH);
+  } else if (digitalRead(FxR) == HIGH) {
       Keyboard.release('m');
-      if(LightsReverseOn == true) digitalWrite(8, HIGH);
-        else digitalWrite(8, LOW);
+      if(LightsReverseOn == true) digitalWrite(FxRL, HIGH);
+        else digitalWrite(FxRL, LOW);
   }
-  if (digitalRead(10) == LOW) {
+  if (digitalRead(FxL) == LOW) {
     Keyboard.press('c');
-    if(LightsReverseOn == true) digitalWrite(16, LOW);
-      else digitalWrite(16, HIGH);
-  } else if (digitalRead(10) == HIGH) {
+    if(LightsReverseOn == true) digitalWrite(FxLL, LOW);
+      else digitalWrite(FxLL, HIGH);
+  } else if (digitalRead(FxL) == HIGH) {
       Keyboard.release('c');
-      if(LightsReverseOn == true) digitalWrite(16, HIGH);
-        else digitalWrite(16, LOW);
+      if(LightsReverseOn == true) digitalWrite(FxLL, HIGH);
+        else digitalWrite(FxLL, LOW);
   }
   //presses ENTER button
-  if (digitalRead(A2) == LOW) {
+  if (digitalRead(StartBtn) == LOW) {
     Keyboard.press(0xB0);
-    if(SdvxComp == true || LightsReverseOn == true) digitalWrite(A3, LOW);
-      else  digitalWrite(A3, HIGH);
-  } else if (digitalRead(A2) == HIGH) {
+    if(SdvxComp == true || LightsReverseOn == true) digitalWrite(StartBtnL, LOW);
+      else  digitalWrite(StartBtnL, HIGH);
+  } else if (digitalRead(StartBtn) == HIGH) {
       Keyboard.release(0xB0);
-    if(SdvxComp == true || LightsReverseOn == true) digitalWrite(A3, HIGH);
-      else   digitalWrite(A3, LOW);
+    if(SdvxComp == true || LightsReverseOn == true) digitalWrite(StartBtnL, HIGH);
+      else   digitalWrite(StartBtnL, LOW);
   }
     //press both FX-L and FX-R and Start BTn to press ESC
-  if(digitalRead(A2) == LOW && digitalRead(7) == LOW ||digitalRead(A2) == LOW && digitalRead(6) == LOW ||digitalRead(A2) == LOW && digitalRead(14) == LOW ||digitalRead(A2) == LOW && digitalRead(15) == LOW) {
+  if(digitalRead(StartBtn) == LOW && digitalRead(BtC) == LOW ||digitalRead(StartBtn) == LOW && digitalRead(BtD) == LOW ||digitalRead(StartBtn) == LOW && digitalRead(BtB) == LOW ||digitalRead(StartBtn) == LOW && digitalRead(BtA) == LOW) {
     Keyboard.press(0xB1);
-  } else if(digitalRead(A2) == HIGH && digitalRead(7) == HIGH || digitalRead(A2) == HIGH && digitalRead(6) == HIGH || digitalRead(A2) == HIGH && digitalRead(14) == HIGH || digitalRead(A2) == HIGH && digitalRead(15) == HIGH) {
+  } else if(digitalRead(StartBtn) == HIGH && digitalRead(BtC) == HIGH || digitalRead(StartBtn) == HIGH && digitalRead(BtD) == HIGH || digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH || digitalRead(StartBtn) == HIGH && digitalRead(BtA) == HIGH) {
       Keyboard.release(0xB1);
     }
     //Press FX-L and FX-R, BT-D and START BTN to toggle Sdvx compability
-  if(digitalRead(A2) == LOW && digitalRead(7) == LOW && digitalRead(9) == LOW && digitalRead(10) == LOW && On == false){
+  if(digitalRead(StartBtn) == LOW && digitalRead(BtC) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW && On == false){
     SdvxComp = !SdvxComp;
     On = true;
-  }else if(digitalRead(A2) == HIGH && digitalRead(7) == HIGH && digitalRead(9) == HIGH && digitalRead(10) == HIGH && On == true) On = false;
+  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtC) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
 
 
 
    //Press FX-L and FX-R, BT-C And Start BTN to toggle light Reverse
-  if(digitalRead(A2) == LOW && digitalRead(14) == LOW && digitalRead(9) == LOW && digitalRead(10) == LOW && On == false) {
+  if(digitalRead(StartBtn) == LOW && digitalRead(BtB) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW && On == false) {
      LightsReverseOn = !LightsReverseOn;
      On = true;
-  }else if(digitalRead(A2) == HIGH && digitalRead(14) == HIGH && digitalRead(9) == HIGH && digitalRead(10) == HIGH && On == true) On = false;
+  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
 
 
    //Encoder Positioning
@@ -187,34 +214,36 @@ void loop() {
       //Rotation Left
         if(encoderPos[0] < 0){
           Keyboard.press('2');
-          delay(10);
+          delay(2);
           encoderPos[i] = 0;
         }else if(encoderPos[0] > 0){
           Keyboard.press('3');
-          delay(10);
+          delay(2);
           encoderPos[i] = 0;
         }
-          if(encoderPos[1] == 0) {
+          if(encoderPos[0] == 0) {
+            delay(15);
             Keyboard.release('2');
             Keyboard.release('3');
         }
          //Rotation Right
         if(encoderPos[1] < 0){
           Keyboard.press('9');
-          delay(DELAY);
+          delay(2);
           encoderPos[i] = 0;
            //Rotation Left
         }else if(encoderPos[1] > 0){
           Keyboard.press('8');
-          delay(DELAY);
+          delay(2);
           encoderPos[i] = 0;
         }
           if(encoderPos[1] == 0) {
+            delay(15);
             Keyboard.release('8');
             Keyboard.release('9');
         }
           //Normal Mouse movement mode
-        }else{
+      }else{
           if(i == 0)  Mouse.move(encoderPos[i], 0, 0);
           if(i == 1)  Mouse.move(0, encoderPos[i], 0);
 
@@ -226,7 +255,7 @@ void loop() {
     // this is the function that makes the lightning animation happen.
      unsigned long currentMillis1 = millis();
      unsigned long currentMillis2 = millis();
-     delay(10);
+     delay(FxL);
   if (currentMillis1 - previousMillis1 >= interval1 && offL == true) {
     previousMillis1 = currentMillis1;
         ledPinLeft++;
@@ -305,8 +334,7 @@ void doEncoderD() {
     rotating[1] = false;
   }
 }
-// this is the Function that changes int speed of the ligthning animation
-void encoderSpeed() {
+void encoderSpeed() { // this is the Function that changes speed of the ligthning animation
   if(encoderPos[0] > -3  && encoderPos[0] < 0 || encoderPos[1] > 0 && encoderPos[1] < 3 ) {
     interval2 = speedI[0];
 
@@ -316,10 +344,10 @@ void encoderSpeed() {
   }else if(encoderPos[0] > -7 && encoderPos[0] < -5 || encoderPos[1] > 5 && encoderPos[1] < 7) {
     interval2 = speedI[2];
 
-  }else if(encoderPos[0] > -10 && encoderPos[0] < -7 || encoderPos[1] > 7 && encoderPos[1] < 10) {
+  }else if(encoderPos[0] > -FxL && encoderPos[0] < -7 || encoderPos[1] > 7 && encoderPos[1] < FxL) {
     interval2 = speedI[3];
 
-  }else if(encoderPos[0] > -15 && encoderPos[0] < -10 || encoderPos[1] > 10 && encoderPos[1] < 15) {
+  }else if(encoderPos[0] > -15 && encoderPos[0] < -FxL || encoderPos[1] > FxL && encoderPos[1] < 15) {
     interval2 = speedI[4];
 
   }else if(encoderPos[0] < -15 ||  15 <encoderPos[1]) {
@@ -335,10 +363,10 @@ void encoderSpeed() {
   }else if(encoderPos[1] > -7 && encoderPos[1] < -5 || encoderPos[0] > 5 && encoderPos[0] < 7) {
     interval1 = speedI[2];
 
-  }else if(encoderPos[1] > -10 && encoderPos[1] < -7 || encoderPos[0] > 7 && encoderPos[0] < 10) {
+  }else if(encoderPos[1] > -FxL && encoderPos[1] < -7 || encoderPos[0] > 7 && encoderPos[0] < FxL) {
     interval1 = speedI[3];
 
-  }else if(encoderPos[1] > -15 && encoderPos[1] < -10 || encoderPos[0] > 10 && encoderPos[0] < 15) {
+  }else if(encoderPos[1] > -15 && encoderPos[1] < -FxL || encoderPos[0] > FxL && encoderPos[0] < 15) {
     interval1 = speedI[4];
 
   }else if(encoderPos[1] < -15 ||  15 <encoderPos[0]) {
@@ -346,3 +374,4 @@ void encoderSpeed() {
 
   }
 }
+
