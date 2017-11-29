@@ -344,10 +344,10 @@ void encoderSpeed() { // this is the Function that changes speed of the ligthnin
   }else if(encoderPos[0] > -7 && encoderPos[0] < -5 || encoderPos[1] > 5 && encoderPos[1] < 7) {
     interval2 = speedI[2];
 
-  }else if(encoderPos[0] > -FxL && encoderPos[0] < -7 || encoderPos[1] > 7 && encoderPos[1] < FxL) {
+  }else if(encoderPos[0] > -10 && encoderPos[0] < -7 || encoderPos[1] > 7 && encoderPos[1] < 10) {
     interval2 = speedI[3];
 
-  }else if(encoderPos[0] > -15 && encoderPos[0] < -FxL || encoderPos[1] > FxL && encoderPos[1] < 15) {
+  }else if(encoderPos[0] > -15 && encoderPos[0] < -10 || encoderPos[1] > 10 && encoderPos[1] < 15) {
     interval2 = speedI[4];
 
   }else if(encoderPos[0] < -15 ||  15 <encoderPos[1]) {
@@ -363,10 +363,10 @@ void encoderSpeed() { // this is the Function that changes speed of the ligthnin
   }else if(encoderPos[1] > -7 && encoderPos[1] < -5 || encoderPos[0] > 5 && encoderPos[0] < 7) {
     interval1 = speedI[2];
 
-  }else if(encoderPos[1] > -FxL && encoderPos[1] < -7 || encoderPos[0] > 7 && encoderPos[0] < FxL) {
+  }else if(encoderPos[1] > -10 && encoderPos[1] < -7 || encoderPos[0] > 7 && encoderPos[0] < 10) {
     interval1 = speedI[3];
 
-  }else if(encoderPos[1] > -15 && encoderPos[1] < -FxL || encoderPos[0] > FxL && encoderPos[0] < 15) {
+  }else if(encoderPos[1] > -15 && encoderPos[1] < -10 || encoderPos[0] > 10 && encoderPos[0] < 15) {
     interval1 = speedI[4];
 
   }else if(encoderPos[1] < -15 ||  15 <encoderPos[0]) {
