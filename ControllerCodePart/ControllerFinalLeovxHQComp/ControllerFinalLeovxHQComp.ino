@@ -202,8 +202,8 @@ void loop() {
 //Press FX-L and FX-R, BT-A And Start BTN to toggle light animation of the encodres
  if(digitalRead(StartBtn) == LOW && digitalRead(BtA) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW) {
 
-     allowAnimation = true;
-  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH) allowAnimation = false;
+     allowAnimation =  !allowAnimation;
+  }
 
    //Encoder Positioning
   for (int i = 0; i <= 1; i++) {
