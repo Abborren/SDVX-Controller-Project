@@ -1,8 +1,8 @@
 /* This code is a heavily modified version of leonardojoy's code and works for a arduino leonardo or
 pro micro which is based upon leonardo
 and works with K-shootmania but also Sound voltex III pc port version.
-Made By Abborren, 2017-11-28 
-https://github.com/Abborren/SDVX-Controller-Project 
+Made By Abborren, 2017-11-28
+https://github.com/Abborren/SDVX-Controller-Project
 the input pins are the same ones that LeovxHQ uses.*/
 
 
@@ -50,10 +50,12 @@ boolean C_set = false;
 boolean D_set = false;
 boolean SdvxComp = false;
 boolean LightsReverseOn = false;
+//
 boolean On = false;
 //for lightning animation
 boolean offL = false;
 boolean offR = false;
+boolean allowAnimation = false;
   // this is where you change the different timer values for the blinking, left and right is the same. in ms.
 int speedI[] = {122, 102, 82, 62 ,42 , 22};
 
@@ -187,29 +189,36 @@ void loop() {
   if(digitalRead(StartBtn) == LOW && digitalRead(BtC) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW && On == false){
     SdvxComp = !SdvxComp;
     On = true;
-  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtC) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
+  } else if(digitalRead(StartBtn) == HIGH && digitalRead(BtC) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
 
 
 
-   //Press FX-L and FX-R, BT-C And Start BTN to toggle light Reverse
+   //Press FX-L and FX-R, BT-B And Start BTN to toggle light Reverse
   if(digitalRead(StartBtn) == LOW && digitalRead(BtB) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW && On == false) {
      LightsReverseOn = !LightsReverseOn;
      On = true;
-  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
+  } else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
 
+//Press FX-L and FX-R, BT-A And Start BTN to toggle light animation of the encodres
+ if(digitalRead(StartBtn) == LOW && digitalRead(BtA) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW) {
+
+     allowAnimation = true;
+  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH) allowAnimation = false;
 
    //Encoder Positioning
   for (int i = 0; i <= 1; i++) {
     rotating[i] = true;
     if (encoderPos[i] != 0) {
-      //for ligtning animation
-      if(encoderPos[1] > 5 && offL == false || encoderPos[0] < -5 && offL == false && LightsReverseOn == false){
-       encoderSpeed();
-       offL = true;
-      }
-      if(encoderPos[1] < -2 && offR == false || encoderPos[0] > 5 && offR == false && LightsReverseOn == false){
-        encoderSpeed();
-        offR = true;
+      if (allowAnimation == true) {
+        //for ligtning animation
+        if(encoderPos[1] > 5 && offL == false || encoderPos[0] < -5 && offL == false && LightsReverseOn == false){
+         encoderSpeed();
+         offL = true;
+        }
+        if(encoderPos[1] < -2 && offR == false || encoderPos[0] > 5 && offR == false && LightsReverseOn == false){
+          encoderSpeed();
+          offR = true;
+        }
       }
       //This is the SDVX Compability toggle for the encoders
          if(SdvxComp == true){
@@ -376,4 +385,3 @@ void encoderSpeed() {  // this is the Function that changes int speed of the lig
 
   }
 }
-

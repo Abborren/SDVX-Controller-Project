@@ -54,6 +54,7 @@ boolean On = false;
 //for lightning animation
 boolean offL = false;
 boolean offR = false;
+boolean allowAnimation = false;
   // this is where you change the different timer values for the blinking, left and right is the same. in ms.
 int speedI[] = {122, 102, 82, 62 ,42 , 22};
 
@@ -195,19 +196,26 @@ void loop() {
      On = true;
   }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH && On == true) On = false;
 
+//Press FX-L and FX-R, BT-A And Start BTN to toggle light animation of the encodres
+ if(digitalRead(StartBtn) == LOW && digitalRead(BtA) == LOW && digitalRead(FxR) == LOW && digitalRead(FxL) == LOW) {
 
+     allowAnimation = true;
+  }else if(digitalRead(StartBtn) == HIGH && digitalRead(BtB) == HIGH && digitalRead(FxR) == HIGH && digitalRead(FxL) == HIGH) allowAnimation = false;
+  
    //Encoder Positioning
   for (int i = 0; i <= 1; i++) {
     rotating[i] = true;
     if (encoderPos[i] != 0) {
       //for ligtning animation
-      if(encoderPos[1] > 5 && offL == false || encoderPos[0] < -5 && offL == false && LightsReverseOn == false){
-       encoderSpeed();
-       offL = true;
-      }
-      if(encoderPos[1] < -2 && offR == false || encoderPos[0] > 5 && offR == false && LightsReverseOn == false){
-        encoderSpeed();
-        offR = true;
+      if (allowAnimation == true) {
+        if(encoderPos[1] > 5 && offL == false || encoderPos[0] < -5 && offL == false && LightsReverseOn == false){
+         encoderSpeed();
+         offL = true;
+        }
+        if(encoderPos[1] < -2 && offR == false || encoderPos[0] > 5 && offR == false && LightsReverseOn == false){
+          encoderSpeed();
+          offR = true;
+        }
       }
       //This is the SDVX Compability toggle for the encoders
       if(SdvxComp == true){
@@ -245,7 +253,7 @@ void loop() {
           //Normal Mouse movement mode
       }else{
           if(i == 0)  Mouse.move(encoderPos[i], 0, 0);
-          if(i == 1)  Mouse.move(0, encoderPos[i], 0);
+          if(i == 1)  Mouse.move(0, encoderPos[i]*-1, 0);
 
           encoderPos[i] = 0;
         }
