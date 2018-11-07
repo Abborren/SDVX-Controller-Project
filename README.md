@@ -1,7 +1,6 @@
 # SDVX Controller Project
 
-First and Foremost I need to say that this would not have been be made possible without the inital Schematics/measurements from Lizardbeans
-Secondly I would like to thank my friends that helped me through the headache that is programming.
+First and Foremost I need to say that this would not have been be made possible without the inital Schematics/measurements from Lizardbeans.
 and lastly if you have any questions feel free to join and ask me on discord.
 
 
